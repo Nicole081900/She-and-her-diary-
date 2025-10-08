@@ -50,7 +50,19 @@ st.markdown(
 st.title("📔 我的日记")
 # 显示今日日期和鼓励语
 st.markdown(f"📅 **{date.today()}**")
-st.markdown("### 💖 亲爱的吴思楠，今天也要快乐啊！！！")
+st.markdown("""
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+    .custom-font {
+        font-family: 'ZCOOL KuaiLe', cursive;
+        font-size: 26px;
+        color: #FF3366;
+    }
+    </style>
+    <div class="custom-font">
+        💖 亲爱的吴思楠，今天也要快乐啊！！！
+    </div>
+""", unsafe_allow_html=True)
 
 
 # 表单输入
