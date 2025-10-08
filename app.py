@@ -62,8 +62,27 @@ st.markdown("""
         💖 亲爱的吴思楠，今天也要快乐啊！！！
     </div>
 """, unsafe_allow_html=True)
+# Get today's date and season
+from datetime import datetime
+today = datetime.today()
+month = today.month
 
+if month in [3, 4, 5]:
+    season = "spring"
+elif month in [6, 7, 8]:
+    season = "summer"
+elif month in [9, 10, 11]:
+    season = "autumn"
+else:
+    season = "winter"
 
+# Always load diary data
+diary_file = os.path.join("data", "diary.json")
+if os.path.exists(diary_file):
+    with open(diary_file, "r", encoding="utf-8") as f:
+        data = json.load(f)
+else:
+    data = []
 # 表单输入
 entry_date = st.date_input("日期", value=date.today())
 uploaded_file = st.file_uploader("上传照片（可选）", type=["jpg", "jpeg", "png"])
@@ -106,6 +125,33 @@ if st.button("💾 保存日记"):
 
     st.success("✅ 日记已保存！")
     st.balloons()
+    st.success("✅ 日记已保存！")
+
+if st.button("💾 保存日记"):
+    os.makedirs("uploads", exist_ok=True)
+
+    image_path = ""
+    if uploaded_file is not None:
+        timestamp = int(time.time())
+        fname = f"{timestamp}_{uploaded_file.name}"
+        save_path = os.path.join("uploads", fname)
+        with open(save_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+        image_path = save_path
+
+    entry = {
+        "date": str(entry_date),
+        "score": float(score),
+        "note": note,
+        "image": image_path,
+        "saved_at": int(time.time())
+    }
+
+    data.append(entry)
+
+    with open(diary_file, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
     st.success("✅ 日记已保存！")
 
 # 🎂 生日祝福
