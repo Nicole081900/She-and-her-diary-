@@ -1,5 +1,5 @@
 import streamlit as st
-from datetime import date
+from datetime import datetime, date
 from PIL import Image
 import json
 import os
@@ -46,9 +46,8 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 页面标题
+# 页面标题与鼓励
 st.title("📔 我的日记")
-# 显示今日日期和鼓励语
 st.markdown(f"📅 **{date.today()}**")
 st.markdown("""
     <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
@@ -62,8 +61,8 @@ st.markdown("""
         💖 亲爱的吴思楠，今天也要快乐啊！！！
     </div>
 """, unsafe_allow_html=True)
-# Get today's date and season
-from datetime import datetime
+
+# 获取当前季节
 today = datetime.today()
 month = today.month
 
@@ -76,92 +75,59 @@ elif month in [9, 10, 11]:
 else:
     season = "winter"
 
-# Always load diary data
+# 日记文件准备
 diary_file = os.path.join("data", "diary.json")
 if os.path.exists(diary_file):
     with open(diary_file, "r", encoding="utf-8") as f:
         data = json.load(f)
 else:
     data = []
-# 表单输入
+
+# 表单输入区域
 entry_date = st.date_input("日期", value=date.today())
 uploaded_file = st.file_uploader("上传照片（可选）", type=["jpg", "jpeg", "png"])
 score = st.slider("心情评分", 0.0, 10.0, 7.0, step=0.5)
 note = st.text_area("今天记录", height=200)
 
-# 保存逻辑
+# 保存日记按钮逻辑
 if st.button("💾 保存日记"):
-    os.makedirs("uploads", exist_ok=True)
+    if note.strip() == "":
+        st.warning("请输入今天的记录后再保存哦！")
+    else:
+        os.makedirs("uploads", exist_ok=True)
 
-    image_path = ""
-    if uploaded_file is not None:
-        timestamp = int(time.time())
-        fname = f"{timestamp}_{uploaded_file.name}"
-        save_path = os.path.join("uploads", fname)
-        with open(save_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        image_path = save_path
+        image_path = ""
+        if uploaded_file is not None:
+            timestamp = int(time.time())
+            fname = f"{timestamp}_{uploaded_file.name}"
+            save_path = os.path.join("uploads", fname)
+            with open(save_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            image_path = save_path
 
-    entry = {
-        "date": str(entry_date),
-        "score": float(score),
-        "note": note,
-        "image": image_path,
-        "saved_at": int(time.time())
-    }
+        entry = {
+            "date": str(entry_date),
+            "score": float(score),
+            "note": note,
+            "image": image_path,
+            "saved_at": int(time.time())
+        }
 
-    diary_file = os.path.join("data", "diary.json")
-    if not os.path.exists(diary_file):
+        data.append(entry)
+
         with open(diary_file, "w", encoding="utf-8") as f:
-            json.dump([], f, ensure_ascii=False, indent=2)
+            json.dump(data, f, ensure_ascii=False, indent=2)
 
-    with open(diary_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    data.append(entry)
-
-    with open(diary_file, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-    st.success("✅ 日记已保存！")
-    st.balloons()
-    st.success("✅ 日记已保存！")
-
-if st.button("💾 保存日记"):
-    os.makedirs("uploads", exist_ok=True)
-
-    image_path = ""
-    if uploaded_file is not None:
-        timestamp = int(time.time())
-        fname = f"{timestamp}_{uploaded_file.name}"
-        save_path = os.path.join("uploads", fname)
-        with open(save_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        image_path = save_path
-
-    entry = {
-        "date": str(entry_date),
-        "score": float(score),
-        "note": note,
-        "image": image_path,
-        "saved_at": int(time.time())
-    }
-
-    data.append(entry)
-
-    with open(diary_file, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-    st.success("✅ 日记已保存！")
+        st.success("✅ 日记已保存！")
+        st.balloons()
 
 # 🎂 生日祝福
-from datetime import date, datetime
 if today.month == 8 and today.day == 19:
     st.balloons()
     st.markdown("🎂 **亲爱的吴思楠，生日快乐呀！！愿你永远幸福，永远闪闪发光！** 🎉")
 
-# 🌸🍦🍎❄️ 每10条日记时根据季节触发特别庆祝
-if len(data) % 10 == 0:
+# 🎉 每10条日记的特别庆祝
+if len(data) > 0 and len(data) % 10 == 0:
     if season == "spring":
         st.markdown("🌸 今天是春天，落樱缤纷，庆祝你写下了第 {} 条日记！".format(len(data)))
         st.balloons()
@@ -175,33 +141,26 @@ if len(data) % 10 == 0:
         st.markdown("❄️ 冬天的雪花为你飘落，庆祝你的第 {} 条日记～".format(len(data)))
         st.snow()
 
-# 显示最近日记
+# 📝 显示最近的日记记录
 st.markdown("---")
 st.subheader("最近的日记")
 
-diary_file = os.path.join("data", "diary.json")
-if os.path.exists(diary_file):
-    with open(diary_file, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    if data:
-        for i, entry in enumerate(reversed(data[-10:])):
-            idx_in_data = len(data) - 10 + i
-            st.write(f"📅 {entry['date']}    评分：{entry['score']}")
-            st.write(entry['note'])
-            if entry.get("image"):
-                try:
-                    img = Image.open(entry["image"])
-                    st.image(img, width=300)
-                except Exception:
-                    st.write("（显示图片失败）")
-            if st.button(f"🗑️ 删除这条日记（{entry['date']}）", key=f"delete_{i}"):
-                del data[idx_in_data]
-                with open(diary_file, "w", encoding="utf-8") as f:
-                    json.dump(data, f, ensure_ascii=False, indent=2)
-                st.experimental_rerun()
-            st.markdown("---")
-    else:
-        st.info("目前没有日记。")
+if data:
+    for i, entry in enumerate(reversed(data[-10:])):
+        idx_in_data = len(data) - 10 + i
+        st.write(f"📅 {entry['date']}    评分：{entry['score']}")
+        st.write(entry['note'])
+        if entry.get("image"):
+            try:
+                img = Image.open(entry["image"])
+                st.image(img, width=300)
+            except Exception:
+                st.write("（显示图片失败）")
+        if st.button(f"🗑️ 删除这条日记（{entry['date']}）", key=f"delete_{i}"):
+            del data[idx_in_data]
+            with open(diary_file, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+            st.experimental_rerun()
+        st.markdown("---")
 else:
-    st.info("目前没有日记文件。")
+    st.info("目前没有日记。")
