@@ -109,6 +109,7 @@ if st.button("💾 保存日记"):
     st.success("✅ 日记已保存！")
 
 # 🎂 生日祝福
+from datetime import date, datetime
 if today.month == 8 and today.day == 19:
     st.balloons()
     st.markdown("🎂 **亲爱的吴思楠，生日快乐呀！！愿你永远幸福，永远闪闪发光！** 🎉")
