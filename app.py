@@ -106,6 +106,27 @@ if st.button("💾 保存日记"):
 
     st.success("✅ 日记已保存！")
     st.balloons()
+    st.success("✅ 日记已保存！")
+
+# 🎂 生日祝福
+if today.month == 8 and today.day == 19:
+    st.balloons()
+    st.markdown("🎂 **亲爱的吴思楠，生日快乐呀！！愿你永远幸福，永远闪闪发光！** 🎉")
+
+# 🌸🍦🍎❄️ 每10条日记时根据季节触发特别庆祝
+if len(data) % 10 == 0:
+    if season == "spring":
+        st.markdown("🌸 今天是春天，落樱缤纷，庆祝你写下了第 {} 条日记！".format(len(data)))
+        st.balloons()
+    elif season == "summer":
+        st.markdown("🍦 夏天的冰淇淋为你庆祝第 {} 条日记！清凉又甜蜜～".format(len(data)))
+        st.image("https://i.imgur.com/O3ZCqQk.png", width=150)
+    elif season == "autumn":
+        st.markdown("🍎 秋天来了，果实累累！这是你第 {} 条日记，太棒啦！".format(len(data)))
+        st.image("https://i.imgur.com/Ue3mL6P.png", width=150)
+    elif season == "winter":
+        st.markdown("❄️ 冬天的雪花为你飘落，庆祝你的第 {} 条日记～".format(len(data)))
+        st.snow()
 
 # 显示最近日记
 st.markdown("---")
