@@ -56,7 +56,6 @@ st.markdown("""
     .custom-font {
         font-family: 'ZCOOL KuaiLe', cursive;
         font-size: 26px;
-        color: #FF3366;
     }
     </style>
     <div class="custom-font">
